@@ -37,10 +37,10 @@
       </main>
     <script>
       let arrProd = [];
-      
+      let URLBase = 'https://proyectoweb-ndns.onrender.com'
       const urlLogin = 'login.html';
-      const apiProd = 'http://localhost:8088/productos';
-      const apiCompra = 'http://localhost:8088/productos/comprar'
+      const apiProd = URLBase+'/productos';
+      const apiCompra = URLBase+'/productos/comprar'
       const btnLogout = document.getElementById('btnLogout');
          window.onload = async function() {
             let usuarioAlmacenado = localStorage.getItem('user');
