@@ -489,30 +489,29 @@ app.post('/productos/comprar', validacionConsulta, async (req, res) => {
                                 return;
                             }
                             if(resultProd.affectedRows > 0){
-                                const imgPath = path.join(__dirname+"/src/img/Tienda.png");
-                                const docName = "recibo-" + Date.now()+".pdf";
-                            
+                                const imgPath = path.join(__dirname + "/src/img/Tienda.png");
+
                                 const doc = new PDFDoc({
                                     size: 'A4',
                                     margin: 40
                                 });
-                            
+
                                 res.setHeader('Content-Type', 'application/pdf');
                                 res.setHeader('Content-Disposition', 'inline; filename=informacion_usuario.pdf');
-                            
+
                                 doc.fontSize(20).text('Recibo de compra', { align: 'center' });
-                            
+
                                 doc.moveDown();
                                 doc.fontSize(12);
                                 doc.text('Se realizo la compra de: ' + result[0].nombre);
                                 doc.text(`Cliente: ${user.nombre} ${user.apellido}`);
-                                doc.text('Se enviará el producto a la direccion: '+user.direccion);
+                                doc.text('Se enviará el producto a la direccion: ' + user.direccion);
                                 doc.text('Gracias por su compra!');
-                            
+
                                 if (imgPath) {
                                     if (fs.existsSync(imgPath)) {
                                         doc.moveDown();
-                                        doc.image(imgPath, doc.page.width - 90 - 10, 10,{
+                                        doc.image(imgPath, doc.page.width - 90 - 10, 10, {
                                             width: 90,
                                             height: 90
                                         });
@@ -524,21 +523,9 @@ app.post('/productos/comprar', validacionConsulta, async (req, res) => {
                                     doc.moveDown();
                                     doc.text('No se subió ninguna imagen.');
                                 }
-                                var docPath = path.join(__dirname+'/recibos/' + docName);
+
+                                doc.pipe(res);
                                 doc.end();
-
-                                const writeStream = fs.createWriteStream(docPath);
-                                doc.pipe(writeStream);
-
-                                writeStream.on('finish', () => {
-                                    res.sendFile(docPath, (err) => {
-                                        if (err) {
-                                            console.error("Error al enviar el archivo:", err);
-                                        } else {
-                                            console.log("Archivo enviado correctamente.");
-                                        }
-                                    });
-                                });
                             }
                         }
                     )
