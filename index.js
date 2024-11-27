@@ -10,16 +10,24 @@ const bcrypt = require('bcryptjs');
 
 const app = express();
 
+const DB_HOST = process.env.DB_HOST || 'localhost';
+const DB_USER = process.env.DB_USER || 'root';
+const DB_PASSWORD = process.env.DB_PASSWORD || '';
+const DB_NAME = process.env.DB_NAME || 'web';
+const DB_PORT = process.env.DB_PORT || '3306';
+
 const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  database: 'web'
+  host: DB_HOST,
+  user: DB_USER,
+  database: DB_NAME,
+  port: DB_PORT,
+  password: DB_PASSWORD
 });
 
 // Middleware para habilitar CORS
 app.use(cors());
 
-const folder = path.join(__dirname+'/archivos/');
+const folder = path.join(__dirname+'/src/archivos/');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -543,6 +551,8 @@ app.post('/productos/comprar', validacionConsulta, async (req, res) => {
     }
 })
 
-app.listen(8088, () => {
-    console.log('Servidor Express escuchando en el puerto 8088');
+const PUERTO = process.env.PORT || 8088
+
+app.listen(process.env.PORT || 8088, () => {
+    console.log('Servidor Express escuchando en el puerto ', PUERTO);
 });
