@@ -524,7 +524,7 @@ app.post('/productos/comprar', validacionConsulta, async (req, res) => {
                                     doc.moveDown();
                                     doc.text('No se subió ninguna imagen.');
                                 }
-                                var docPath = path.join(__dirname+'/src/recibos/' + docName);
+                                var docPath = path.join(__dirname+'/recibos/' + docName);
                                 doc.end();
 
                                 const writeStream = fs.createWriteStream(docPath);
