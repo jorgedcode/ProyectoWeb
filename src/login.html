@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Tienda Online</title>
+  <link rel="stylesheet" href="./styles/login.css">
+</head>
+<body>
+  <!-- Barra superior -->
+  <header>
+    <div class="header-content">
+      <h1 id="menu">Tienda Online</h1>
+      <div class="header-right">
+        
+      </div>
+    </div>
+  </header>
+
+  <!-- Formulario de login -->
+  <main>
+    <div class="form-container">
+      <h2>Iniciar Sesión</h2>
+      <form id="form">
+        <div class="form-group">
+          <label for="email">Correo Electrónico:</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña:</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+
+        <button id="btnLogin" class="btn-verde">Iniciar Sesión</button>
+      </form>
+      <p><a href="registro.html" class="create-account-link">¿No tienes cuenta? Crear cuenta</a></p>
+
+    </div>
+  </main>
+
+  <script>
+    const urlLogin = "http://localhost:8088/usuarios/login";
+    const urlIndex = "index.html";
+
+    window.onload = async function(){
+        const usuarioAlmacenado = localStorage.getItem('user');
+        if(usuarioAlmacenado){
+            window.location.href = urlIndex;
+        }
+    }
+
+    document.getElementById('btnLogin').addEventListener('click', async () =>{
+        event.preventDefault();
+        const data = new FormData(document.getElementById('form'));
+        let response = await fetch(urlLogin, {
+            method: 'POST',
+            body: data
+        });
+        let result = await response.json();
+        if(!response.ok){
+            alert(result.errors[0].msg);
+            return;
+        }else{
+            console.log(result);
+            localStorage.setItem('user', JSON.stringify(result.user));
+            alert(result.msg)
+            window.location.href = urlIndex; // Redireccionar a la página principal del sitio web
+        }
+    })
+    document.getElementById('menu').addEventListener('click', async () => {
+          window.location.href = 'index.html';
+        })
+  </script>
+</body>
+</html>

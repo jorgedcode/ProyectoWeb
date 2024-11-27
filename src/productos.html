@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Producto - Tienda Online</title>
+  <link rel="stylesheet" href="./styles/login.css">
+  <link
+      href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css"
+      rel="stylesheet"
+    />
+</head>
+<body>
+  
+  <header>
+    <div class="header-content">
+      <h1 id="menu">Tienda Online</h1>
+      <div class="header-right">
+        
+      </div>
+    </div>
+  </header>
+
+  
+  <main>
+    <div class="form-container">
+      <h2>Administrar Producto</h2>
+      <form id="productForm">
+        <div class="form-group">
+          <label for="producto">Nombre del Producto:</label>
+          <input type="text" id="producto" name="producto" required>
+        </div>
+
+        
+        <div class="form-group">
+          <label for="precio">Precio:</label>
+          <input type="number" id="precio" name="precio" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label for="stock">Cantidad en Stock:</label>
+          <input type="number" id="stock" name="stock" required>
+        </div>
+
+        <div class="form-group">
+          <label for="imgurl">URL de la Imagen:</label>
+          <input type="url" id="imgurl" name="imgurl" required>
+        </div>
+
+        <button id="btnRegistrar" class="btn-azul">Registrar Producto</button>
+      </form>
+
+      <div class="product-search">
+        <h3>Consultar Producto</h3>
+        <input type="text" id="consulta" class="search-bar" placeholder="Consultar por id del producto">
+        <button id="btnConsulta" class="btn-verde">Consultar</button>
+      </div>
+
+      <div class="product-actions">
+        <button id="btnUpdate" class="btn-amarillo">Actualizar Producto</button>
+        <button id="btnDelete" class="btn-rojo">Eliminar Producto</button>
+      </div>
+    </div>
+</main>
+    <div id="wrapper"></div>
+    <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+    <script>
+
+        fetch('http://localhost:8088/productos')
+            .then(response => response.json())
+                .then(data =>{
+                    console.log(data);
+                    
+                    new gridjs.Grid({
+                        columns: ["id","Nombre", "Precio", "Stock"],
+                        data : data.map( producto => [producto.id, producto.nombre, producto.precio, producto.stock])
+                    }).render(document.getElementById('wrapper'))
+                })
+                .catch(error => console.error("Error: ", error));
+
+    </script>
+  
+  <script>
+    urlIndex = "index.html";
+    urlLogin = "login.html";
+    urlCrear = "http://localhost:8088/productos/crear";
+    urlConsulta = "http://localhost:8088/productos/consulta";
+    urlActualizar = "http://localhost:8088/productos";
+    urlDelete = "http://localhost:8088/productos";
+
+    window.onload = async function(){
+        const usuarioAlmacenado = localStorage.getItem('user');
+        if(usuarioAlmacenado){
+            
+        }else{
+            window.location.href = urlLogin;
+        }
+    }
+
+    document.getElementById('menu').addEventListener('click', async () => {
+          window.location.href = 'index.html';
+        })
+
+    document.getElementById('btnRegistrar').addEventListener('click', async ()=> {
+        event.preventDefault();
+        const data = new FormData(document.getElementById('productForm'));
+        let response = await fetch(urlCrear, {
+            method: 'POST',
+            body: data
+        });
+        let result = await response.json();
+        if(response.ok){
+            alert("Producto registrado correctamente.");
+            window.location.reload();
+        }else{
+            var cadenaErrores = "";
+            for(errores of result.errors){
+                cadenaErrores += errores.msg+"\n";
+            }
+            alert(cadenaErrores);
+        }
+    })
+
+    document.getElementById('btnConsulta').addEventListener('click', async ()=> {
+        event.preventDefault();
+        const consulta = document.getElementById('consulta').value;
+        let response = await fetch(urlConsulta+"?id="+consulta);
+        let result = await response.json();
+        if(response.ok){
+            document.getElementById('producto').value = result.nombre;
+            document.getElementById('precio').value = result.precio;
+            document.getElementById('stock').value = result.stock;
+            document.getElementById('imgurl').value = result.urlimg;
+            
+        } else {
+            alert("No se encontró el producto.");
+        }
+    })
+
+    document.getElementById('btnUpdate').addEventListener('click', async ()=> {
+        event.preventDefault();
+        const id = document.getElementById('consulta').value;
+        const data = new FormData(document.getElementById('productForm'));
+        let response = await fetch(urlActualizar+"?id="+id, {
+            method: 'PUT',
+            body: data
+        });
+        let result = await response.json();
+        if(response.ok){
+            alert("Producto actualizado correctamente.");
+            window.location.reload();
+        } else{
+            var cadenaErrores = "";
+            for(errores of result.errors){
+                cadenaErrores += errores.msg+"\n";
+            }
+            alert(cadenaErrores);
+        }
+    })
+
+    document.getElementById('btnDelete').addEventListener('click', async ()=> {
+        event.preventDefault();
+        const id = document.getElementById('consulta').value;
+        let response = await fetch(urlDelete+"?id="+id, {
+            method: 'DELETE',
+        });
+        let result = await response.json();
+        if(response.ok){
+            alert("Producto eliminado correctamente.");
+            window.location.reload();
+        } else{
+            alert("No se pudo eliminar el producto.");
+        }
+    })
+
+  </script>
+
+</body>
+</html>
