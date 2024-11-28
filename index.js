@@ -355,7 +355,7 @@ app.post('/productos/crear', validacionProductos, async (req, res) => {
                 if(results.affectedRows > 0){
                     res.status(201).json({msg: 'Producto creado correctamente', data : {
                          id: results.insertId,
-                         nombre: nombre,
+                         nombre: producto,
                          precio: precio,
                          stock: stock,
                          imgurl: imgurl
